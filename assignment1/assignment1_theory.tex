@@ -1,0 +1,99 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+
+\def\ra{\rightarrow}
+\def\cc{\,\|\,}
+\def\gc{\,\square\,}
+\def\ch{\,|\,}
+\def\ic{\,\sqcap\,}
+\def\co{\backslash}
+\newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
+
+\title{Extreme Multiprogramming\\Assignment 1 - theory}
+\author{Malte Stær Nissen}
+
+\begin{document}
+\maketitle
+
+\section{Satisfiability proof}
+\section{Derrivation of process definitions}
+\subsection{$a = V \cc R$}
+
+\begin{align*}
+    \alpha \left( Sa \right) &= \alpha(V)
+    \cup \alpha(R) = \sN{c,p,s} \cup \sN{c,t} = \sN{c,p,s,t} \\
+    Sa &= c \ra (\underbrace{\left( p \ra V \ch s \ra v \right)}_{Sa'}
+     \cc \underbrace{\left( c \ra t \ra R \right)}_{R'}) & [2.2.1,~L4A] \\
+    A &= \sN{p,c},~~B = \sN{t},~~C = \sN{p,t} & [2.3.1,~L7] \\
+    Sa &= c \ra \left(p \ra  (V \cc R') \ch t \ra (R \cc V') \right) \\
+       &= c \ra \left(p \ra (t \ra (V \cc R))
+                  \ch t \ra \left( c \ra t \ra R\right) \cc \left(p \ra V
+                         \ch s \ra v \right) \right) & [2.3.1,~L5B] \\
+       &= c \ra \left( p \ra ( t \ra Sa)
+                  \ch t \ra ( \left( c \ra t \ra R\right) \cc \left(p \ra V
+                         \ch s \ra v \right) ) \right) & [2.3.1,~L5B] \\
+    A &= \sN{c},~~B=\sN{p,c},~~C=\sN{c,p} & [2.3.1,~L7] \\
+    Sa &= c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra (V \cc R) \ch c \ra( (t \ra R) \cc (s \to V)))
+                  \right) \\
+      &= c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (R \cc (s \to V))
+                  \ch s \ra ( (t \ra R) \cc V)))
+                  \right) & [2.3.1,~L6] \\
+       &= c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra (R \cc V))
+                  \ch s \ra ( (t \ra R) \cc V)))
+                  \right) & [2.3.1,~L5B] \\
+       &= c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                  \ch s \ra ( t \ra (R \cc V))))
+                  \right) & [2.3.1,~L5A] \\
+       &= c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                  \ch s \ra (t \ra Sa)))
+                  \right)
+\end{align*}
+
+\subsection{$Sb = Sa \cc T1$}
+
+\begin{align*}
+    \alpha \left( Sb \right) &= \alpha(Sa) \cup \alpha(T1) = \sN{c,p,s,t} \\
+    sb &= (c \ra \left( p \ra (t \ra sa)
+                  \ch t \ra ( p \ra sa \ch c \ra (t \ra (s \ra sa)
+                  \ch s \ra (t \ra sa)))
+                  \right)) \cc (s \ra t1) & \\
+       &= c \ra (\left( p \ra (t \ra sa)
+                  \ch t \ra ( p \ra sa \ch c \ra (t \ra (s \ra sa)
+                  \ch s \ra (t \ra sa)))
+                  \right) \cc (s \ra t1)) & [2.3.1,~L5A] \\
+       A &=\sN{p,t},~~B=\sN{s},~~C=\sN{t} & [2.3.1,~L7] \\
+    Sb &= c \ra t \ra ( ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                  \ch s \ra (t \ra Sa)))
+                   \cc (s \ra T1)) & \\
+     A &=\sN{p,c},~~B=\sN{s},~~C=\sN{c} & [2.3.1,~L7] \\
+    Sb &= c \ra t \ra c \ra ((t \ra (s \ra Sa)
+                  \ch s \ra (t \ra Sa))
+                   \cc (s \ra T1)) & \\
+     A &=\sN{t,s},~~B=\sN{s},~~C=\sN{s,t} & [2.3.1,~L7] \\
+    Sb &= c \ra t \ra c \ra (t \ra ((s \ra Sa) \cc (s \ra T1))
+                  \ch s \ra ((t \ra Sa) \cc T1) & \\
+       &= c \ra t \ra c \ra (t \ra (s \ra Sa \cc T1)
+                  \ch s \ra ((t \ra Sa) \cc T1)) & [2.3.1,~L4A] \\
+       &= c \ra t \ra c \ra (t \ra (s \ra Sb)
+                  \ch s \ra (t \ra Sa \cc T1)) & [2.3.1,~L5A] \\
+       &= c \ra t \ra c \ra (t \ra (s \ra Sb)
+                  \ch s \ra (t \ra Sb)) & \\
+\end{align*}
+
+\subsection{$Sc = R \cc T1$}
+
+\begin{align*}
+\end{align*}
+
+\end{document}
