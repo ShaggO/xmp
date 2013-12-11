@@ -1,6 +1,6 @@
 \documentclass[11pt,a4paper]{article}
 
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=0.3in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
@@ -142,10 +142,55 @@
 
 \subsection{$Se = Sa \cc T2$}
 
+\begin{align*}
+    \alpha(Se) &= \alpha(Sa) \cup \alpha(T2) = \sN{c,p,s,t} \cup \sN{s,p} =
+    \sN{c,p,s,t} & \\
+    Se &= (c \ra \left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                  \ch s \ra (t \ra Sa)))
+                  \right)) \cc (p \ra T2) \\
+       &= c \ra (\left( p \ra (t \ra Sa)
+                  \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                  \ch s \ra (t \ra Sa)))
+                  \right) \cc (p \ra T2)) & [2.3.1,~L5A] \\
+     A &= \sN{p,t},~~ B = \sN{p},~~ C = \sN{p,t} & [2.3.1,~L7] \\
+    Se &= c \ra \left( p \ra ((t \ra Sa) \cc T2)
+                  \ch t \ra (( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                      \ch s \ra (t \ra Sa))) \cc (p \ra T2))
+                      \right) & \\
+       &= c \ra \left( p \ra (t \ra (Sa \cc T2))
+                  \ch t \ra (( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                      \ch s \ra (t \ra Sa))) \cc (p \ra T2))
+                      \right) & [2.3.1,~L5A] \\
+       &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra (( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
+                      \ch s \ra (t \ra Sa))) \cc (p \ra T2))
+                      \right) & \\
+     A &= \sN{p,c},~~ B = \sN{p},~~ C = \sN{p,c} & [2.3.1,~L7] \\
+    Se &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra ( p \ra (Sa \cc T2) \ch c \ra ((t \ra (s \ra Sa)
+                      \ch s \ra (t \ra Sa) \cc (p \ra T2))))
+                      \right) & \\
+       &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra ( p \ra Se \ch c \ra ((t \ra (s \ra Sa)
+                      \ch s \ra (t \ra Sa) \cc (p \ra T2))))
+                      \right) & \\
+     A &= \sN{t,s},~~ B = \sN{p},~~ C = \sN{t} & [2.3.1,~L7] \\
+    Se &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra ( p \ra Se \ch c \ra (t \ra ((s \ra Sa) \cc (p \ra
+                  T2))))
+                      \right) & \\
+       &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra ( p \ra Se \ch c \ra (t \ra STOP))
+                  \right) & [2.3.1,~L4B] \\
+\end{align*}
+
 \subsection{$Sf = V \cc f(Sc)$}
 
-\begin{align}
-    f(c) = c,~~  f(t) = t,~~ f(p) = s,~~ f(s) = p
-\end{align}
+\begin{align*}
+    f(c) &= c,~~  f(t) = t,~~ f(p) = s,~~ f(s) = p & \\
+    \alpha(Sf) &= \alpha(V) \cup \alpha(f(Sc)) = \sN{c,p,s} \cup \sN{c,t,s,p} =
+    \sN{c,t,s,p} & \\
+\end{align*}
 
 \end{document}
