@@ -82,7 +82,7 @@
                    \cc (s \ra T1)) & \\
      A &=\sN{t,s},~~B=\sN{s},~~C=\sN{s,t} & [2.3.1,~L7] \\
     Sb &= c \ra t \ra c \ra (t \ra ((s \ra Sa) \cc (s \ra T1))
-                  \ch s \ra ((t \ra Sa) \cc T1) & \\
+                  \ch s \ra ((t \ra Sa) \cc T1)) & \\
        &= c \ra t \ra c \ra (t \ra (s \ra Sa \cc T1)
                   \ch s \ra ((t \ra Sa) \cc T1)) & [2.3.1,~L4A] \\
        &= c \ra t \ra c \ra (t \ra (s \ra Sb)
@@ -94,6 +94,58 @@
 \subsection{$Sc = R \cc T1$}
 
 \begin{align*}
+    \alpha(Sc) &= \alpha (R) \cup \alpha(T1) = \sN{c,t} \cup \sN{s,p} = \sN{c,t,s,p} & \\
+    Sc &= (c \ra t \ra R) \cc (s \ra T1) & \\
+       &= (c \ra ((t \ra R)\cc (s \ra T1)) \ch s \ra ( (c \ra (t \ra R)) \cc T1)) & [2.3.1,~L6] \\
+       &= (c \ra ((t \ra R)\cc (s \ra T1)) \ch s \ra Sc) & \\
+    Sc' &= (t \ra R) \cc T1 & \\
+        &= (t \ra R) \cc (s \ra T1) \\
+    &= (t \ra ( R \cc (s \ra T1)) \ch s \ra ((t \ra R) \cc T1)) & [2.3.1,~L6] \\
+    &= (t \ra Sc \ch s \ra Sc') & \\
+    Sc &= (c \ra ((t \ra R)\cc (s \ra T1)) \ch s \ra  Sc) & \\
+       &= (c \ra (t \ra (R \cc (s \ra T1)) \ch s \ra ((t \ra R) \cc T1)) \ch s \ra  Sc) & [2.3.1,~L6] \\
+       &= (c \ra (t \ra Sc \ch s \ra Sc') \ch s \ra  Sc) & \\
 \end{align*}
+
+\subsection{$Sd = V \cc Sc$}
+
+\begin{align*}
+    \alpha(Sd) &= \alpha(V) \cup \alpha(Sc) = \sN{c,p,s} \cup \sN{c,t,s,p} =
+    \sN{c,t,s,p} & \\
+    Sd &= (c \ra (p \ra V \ch c \ra s \ra V ) ) \cc
+          (c \ra (t \ra Sc \ch s \ra Sc') \ch s \ra Sc) & \\
+     A &= \sN{c},~~ B = \sN{c,s},~~ C = \sN{c} & [2.3.1,~L7] \\
+    Sd &= c \ra (( p \ra V \ch c \ra s \ra V) \cc (t \ra Sc \ch s \ra Sc')) & \\
+    A &= \sN{p,c},~~ B = \sN{t,s},~~C = \sN{t} & [2.3.1,~L7] \\
+       &= c \ra t \ra (( p \ra V \ch c \ra s \ra V) \cc Sc) & \\
+       &= c \ra t \ra (( p \ra V \ch c \ra s \ra V) \cc (c \ra (t \ra Sc \ch s \ra Sc') \ch s \ra  Sc)) & \\
+     A &= \sN{p,c},~~ B = \sN{c,s},~~ C = \sN{c} & [2.3.1,~L7] \\
+    Sd &= c \ra t \ra c \ra ((s \ra V) \cc (t \ra Sc \ch s \ra Sc')) & \\
+     A &= \sN{s},~~ B = \sN{t,s},~~ C = \sN{s,t} & [2.3.1,~L7] \\
+    Sd &= c \ra t \ra c \ra (s \ra (V \cc Sc') \ch t \ra ((s \ra V) \cc Sc)) & \\
+       &= c \ra t \ra c \ra
+            (s \ra ((c \ra (p \ra V \ch c \ra s \ra V)) \cc
+            (t \ra Sc \ch s \ra Sc')) \ch t \ra ((s \ra V) \cc Sc)) & \\
+     A &= \sN{c},~~ B = \sN{t,s},~~ C = \sN{t} & [2.3.1,~L7] \\
+    Sd &= c \ra t \ra c \ra
+            (s \ra (t \ra ((c \ra (p \ra V \ch c \ra s \ra V))) \cc
+            Sc) \ch t \ra ((s \ra V) \cc Sc))) & \\
+       &= c \ra t \ra c \ra
+            (s \ra (t \ra (V \cc Sc)) \ch t \ra ((s \ra V) \cc
+            (c \ra (t \ra Sc \ch s \ra Sc')) \ch s \ra Sc)) & \\
+     A &= \sN{s},~~ B = \sN{c,s},~~ C = \sN{s} & [2.3.1,~L7] \\
+    Sd &= c \ra t \ra c \ra
+            (s \ra (t \ra Sd) \ch t \ra (s \ra (V \cc Sc))) & \\
+       &= c \ra t \ra c \ra
+            (s \ra (t \ra Sd) \ch t \ra (s \ra Sd)) & \\
+\end{align*}
+
+\subsection{$Se = Sa \cc T2$}
+
+\subsection{$Sf = V \cc f(Sc)$}
+
+\begin{align}
+    f(c) = c,~~  f(t) = t,~~ f(p) = s,~~ f(s) = p
+\end{align}
 
 \end{document}
