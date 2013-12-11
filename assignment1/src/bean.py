@@ -83,7 +83,6 @@ def biasOscillator(cin, cout, bias):
             # Perform operation on bias
             bias = operation(bias)
 
-
 # Bean Machine initialization function
 def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
     # Calculate number of pins and channels in the machine
@@ -105,13 +104,14 @@ def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
     # Initialize channels
     chans = Channel() * nChans
 
-    # Set bias channels
+    # Set bias channel variables (reader for the collector and writer for
+    # injector)
     if bias is not None:
-        biasChan = chans[nChans-1]
-        biasIn = chans[nChans-2]
+        biasInCol = chans[nChans-2].reader()
+        biasInInj = chans[nChans-2].writer()
     else:
-        biasChan = None
-        biasIn = None
+        biasInCol = None
+        biasInInj = None
 
     # Create arrays of reader and writer endpoints, bin messages to send and
     # initial pin index
@@ -119,6 +119,7 @@ def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
     readers = []
     binNumbers = []
     idx = 0
+    biasChan = [None] * pins
 
     # Populate arrays initialized above by looping over levels/layers in the
     # bean machine
@@ -144,36 +145,38 @@ def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
             binNumbers.append(j)
             binNumbers.append(j+1)
 
+            # Register bias channel reader if needed
+            if bias is not None:
+                biasChan[idx] = chans[nChans-1].reader()
+
             # Increase pin counter
             idx += 1
 
-    # Instantiate bean machine processes in parallel (pins, injector, collector)
+    others = [binCollector(chans[pins].reader(), levels+1, nCount,biasInCol),
+              ballInject(chans[0].writer(), nInject, biasInInj)]
+
+    # Initialize network
     if bias is not None:
-        Parallel(
-            [pin(readers[i],writers[i*2],writers[i*2+1],binNumbers[i*2],binNumbers[i*2+1],biasChan.reader()) for i in range(pins)],
-            binCollector(chans[pins].reader(), levels+1, nCount, biasIn.reader()),
-            ballInject(chans[0].writer(), nInject, biasIn.writer()),
-            biasOscillator(biasIn.reader(), biasChan.writer(), bias)
-        )
-    else:
-        Parallel(
-            [pin(readers[i],writers[i*2],writers[i*2+1],binNumbers[i*2],binNumbers[i*2+1]) for i in range(pins)],
-            binCollector(chans[pins].reader(), levels+1, nCount),
-            ballInject(chans[0].writer(), nInject),
-        )
+        others.append(biasOscillator(chans[nChans-2].reader(),chans[nChans-1].writer(), bias))
+
+    Parallel(
+        [pin(readers[i],writers[i*2],writers[i*2+1],binNumbers[i*2],binNumbers[i*2+1], biasChan[i]) for i in range(pins)],
+        others
+    )
 
 
 # Problem 1
 layers = 2;
 nChans = layers*(layers+1)/2 + 2
 chan = Channel() * nChans
+others = [binCollector(chan[3].reader(), layers+1,100),
+            ballInject(chan[0].writer())]
 
 Parallel(
     pin(chan[0].reader(),chan[1].writer(),chan[2].writer(),0,0),
     pin(chan[1].reader(),chan[3].writer(),chan[3].writer(),0,1),
     pin(chan[2].reader(),chan[3].writer(),chan[3].writer(),1,2),
-    binCollector(chan[3].reader(), layers+1, 100),
-    ballInject(chan[0].writer())
+    others
 )
 
 # Problem 2
