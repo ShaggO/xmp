@@ -15,6 +15,8 @@
 \def\co{\backslash}
 \newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
 
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
 \title{Extreme Multiprogramming\\Assignment 1 - theory}
 \author{Malte Stær Nissen}
 
@@ -188,9 +190,46 @@
 \subsection{$Sf = V \cc f(Sc)$}
 
 \begin{align*}
-    f(c) &= c,~~  f(t) = t,~~ f(p) = s,~~ f(s) = p & \\
     \alpha(Sf) &= \alpha(V) \cup \alpha(f(Sc)) = \sN{c,p,s} \cup \sN{c,t,s,p} =
     \sN{c,t,s,p} & \\
+    f(c) &= c,~~  f(t) = t,~~ f(p) = s,~~ f(s) = p & \\
+    f(Sc) &= f(c \ra (t \ra Sc \ch s \ra Sc') \ch s \ra  Sc) & \\
+          &= (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc)) & [2.6.1,~L2] \\
+    f(Sc') &= f(t \ra Sc \ch s \ra Sc') & \\
+           &= (t \ra f(Sc) \ch p \ra f(Sc')) & [2.6.1,~L2] \\
+    Sf &= (c \ra (p \ra V \ch c \ra s \ra V)) \cc
+            (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc)) & \\
+     A &= \sN{c},~~ B = \sN{c,p},~~ C = \sN{c} & [2.3.1,~L7] \\
+    Sf &= c \ra ((p \ra V \ch c \ra s \ra V) \cc
+                  (t \ra f(Sc) \ch p \ra f(Sc'))) & \\
+     A &= \sN{p,c},~~ B = \sN{t,p},~~ C = \sN{p,t} & [2.3.1,~L7] \\
+    Sf &= c \ra (p \ra (V \cc f(Sc'))
+             \ch t \ra ( (p \ra V \ch c \ra s \ra V) \cc f(Sc)) ) & \\
+    V \cc f(Sc') &= (c \ra (p \ra V \ch c \ra s \ra V))
+                \cc (t \ra f(Sc) \ch p \ra f(Sc')) & \\
+     A &= \sN{c},~~ B = \sN{t,p},~~ C = \sN{t} & [2.3.1,~L7] \\
+    V \cc f(Sc') &= t \ra ((c \ra (p \ra V \ch c \ra s \ra V)) \cc f(Sc)) & \\
+                 &= t \ra (V \cc f(Sc)) = t \ra Sf & \\
+    Sf &= c \ra (p \ra (t \ra Sf)
+    \ch t \ra \underbrace{( (p \ra V \ch c \ra s \ra V) \cc f(Sc))}_{Sf'} ) & \\
+    Sf'   &= (p \ra V \ch c \ra s \ra V) \cc f(Sc) & \\
+          &= (p \ra V \ch c \ra s \ra V) \cc
+             (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc)) & \\
+        A &= \sN{p,c},~~ B = \sN{c,p}, C = \sN{p,c} & [2.3.1,~L7] \\
+    Sf'   &= (p \ra (V \cc f(Sc))  \ch c \ra ((s \ra V) \cc
+             (t \ra f(Sc) \ch p \ra f(Sc)))) & \\
+          &= (p \ra Sf  \ch c \ra ((s \ra V) \cc
+             (t \ra f(Sc) \ch p \ra f(Sc)))) & \\
+        A &= \sN{s},~~ B = \sN{t,p},~~ C = \sN{t} & [2.3.1,~L7] \\
+    Sf'   &= (p \ra Sf  \ch
+              c \ra (t \ra ((s \ra V) \cc f(Sc)))) & \\
+          &= (p \ra Sf  \ch
+              c \ra (t \ra ((s \ra V) \cc
+                            (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc))))) & \\
+        A &= \sN{s},~~ B = \sN{c,p},~~ C = \sN{ } & [2.3.1,~L7] \\
+    Sf'   &= (p \ra Sf \ch c \ra (t \ra STOP)) & \\
+    Sf &= c \ra (p \ra (t \ra Sf)
+            \ch t \ra  (p \ra Sf \ch c \ra (t \ra STOP))) & \\
 \end{align*}
 
 \end{document}
