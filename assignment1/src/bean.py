@@ -113,16 +113,15 @@ def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
         biasInCol = None
         biasInInj = None
 
-    # Create arrays of reader and writer endpoints, bin messages to send and
-    # initial pin index
+    #Initialize arrays for the pins
     writers = []
     readers = []
     binNumbers = []
     idx = 0
     biasChan = [None] * pins
 
-    # Populate arrays initialized above by looping over levels/layers in the
-    # bean machine
+    # Populate arrays initialized above by looping over
+    # levels/layers in the bean machine
     for i in range(1,levels+1):
         # Loop over pins in current level/layer
         for j in range(i):
@@ -152,15 +151,23 @@ def beanMachine(levels, nBalls, terminate = 'inject', bias = None):
             # Increase pin counter
             idx += 1
 
-    others = [binCollector(chans[pins].reader(), levels+1, nCount,biasInCol),
-              ballInject(chans[0].writer(), nInject, biasInInj)]
+    others = [binCollector(chans[pins].reader(),
+                           levels+1, nCount,biasInCol),
+              ballInject(chans[0].writer(), nInject,
+                         biasInInj)]
 
     # Initialize network
     if bias is not None:
-        others.append(biasOscillator(chans[nChans-2].reader(),chans[nChans-1].writer(), bias))
+        others.append(biasOscillator(chans[nChans-2].reader(),
+                                     chans[nChans-1].writer(),
+                                     bias))
 
     Parallel(
-        [pin(readers[i],writers[i*2],writers[i*2+1],binNumbers[i*2],binNumbers[i*2+1], biasChan[i]) for i in range(pins)],
+        [pin(readers[i],writers[i*2],
+             writers[i*2+1],
+             binNumbers[i*2],
+             binNumbers[i*2+1],
+             biasChan[i]) for i in range(pins)],
         others
     )
 
