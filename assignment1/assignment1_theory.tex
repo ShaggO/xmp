@@ -6,6 +6,7 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath}
+\usepackage{amssymb}
 
 \def\ra{\rightarrow}
 \def\cc{\,\|\,}
@@ -13,6 +14,9 @@
 \def\ch{\,|\,}
 \def\ic{\,\sqcap\,}
 \def\co{\backslash}
+\def\cat{^{\frown}}
+\def\filter{\,\upharpoonright\,}
+\newcommand{\ab}[1]{\left \langle #1 \right \rangle}
 \newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
 
 \renewcommand{\thesubsection}{\thesection.\alph{subsection}}
@@ -24,6 +28,9 @@
 \maketitle
 
 \section{Satisfiability proof}
+
+
+
 \section{Derrivation of process definitions}
 \subsection{$a = V \cc R$}
 
@@ -231,5 +238,196 @@
     Sf &= c \ra (p \ra (t \ra Sf)
             \ch t \ra  (p \ra Sf \ch c \ra (t \ra STOP))) & \\
 \end{align*}
+
+\section{Processes and deadlocking}
+
+\subsection{Non-deadlocking processes}
+I am in this quested asked to argue that none of the processes from 2(a-d) can
+deadlock.
+
+For 2a it's quite simple to prove by using [2.7,~L2]. None of the
+processes $V$ and $R$ stop themselves and $\alpha(V) \cap \alpha(R) = \sN{c}$ so
+all conditions for the law stated are fulfilled and hence $Sa = (V \cc R)$ never
+stops.
+
+For the rest of the processes 1(b-d) I will adhere from proving formally that a
+deadlock will not occur. If we instead just look at the final definitions with
+no concurrent compositions, we realize that deadlocking is not appearing. All
+the definitions are recursively defined and none of the definitions contain any
+$STOP$s and hence deadlocks will not occur unless we introduce new concurrent
+processes in which case the processes are no longer defined as in 2(a-d).
+
+\subsection{Deadlock of 2(e)}
+
+We need to find a trace for which the process from 2(e) deadlocks. By looking at
+the process definition we obviously need the following trace $s = \ab{c, t, c,
+t}$, which I will now formally derrive from $Se$ using the trace laws. In order
+to shorten the prooflines I have chosen to use rules [1.8.3,~L3A] and
+[1.8.3,~L4] to denote $Se$ after a trace.
+
+\begin{align*}
+    Se &= c \ra \left( p \ra (t \ra Se)
+                  \ch t \ra ( p \ra Se \ch c \ra (t \ra STOP))
+                  \right) & \\
+    traces(Se) &= \sN{\ab{ }} \cup \sN{\ab{c} \cat t \ch
+                      t \in traces(Se / \ab{c})} & [1.8.1,~L2] \\
+    traces(Se/\ab{c}) &= \sN{t \ch t = \ab{ }
+        \lor (t_0 = p \land t' \in traces(Se/\ab{c,p}))
+        \lor (t_0 = t \land t' \in traces(Se/\ab{c,t})) }  & [1.8.1,~L3] \\
+        &= \sN{\ab{ } } \cup \sN{\ab{p} \cat t \ch t \in traces(Se/\ab{c,p})}
+                        \cup \sN{\ab{t} \cat t \ch t \in traces(Se/\ab{c,t})} & \\
+    traces(Se/\ab{c,t}) &= \sN{\ab{ }} \cup
+                           \sN{\ab{p} \cat t \ch t \in traces(Se/\ab{c,t,p})} \cup
+                           \sN{\ab{c} \cat t \ch t \in traces(Se/\ab{c,t,c}}
+                           & [1.8.1,~L3] \\
+    traces(Se/\ab{c,t,c}) &= \sN{\ab{ }} \cup
+                             \sN{\ab{t} \cat t \ch t \in
+                             traces(Se/\ab{c,t,p,t})} & [1.8.1,~L2] \\
+    traces(Se/\ab{c,t,c,t}) &= \sN{\ab{ } } & [1.8.1,~L1] \\
+    traces(Se) &\supseteq \sN{\ab{ }, \ab{c,p}, \ab{c,t}, \ab{c,t,p}, \ab{c,t,c},
+    \ab{c,t,c,t}} & \\
+    s &= \ab{c,t,c,t} \in traces(Se) & \\
+    Se/s &= STOP & 4\times[1.8.1,~L3A]
+\end{align*}
+
+\subsection{$Sx = (V \cc R) \cc T2$}
+
+We need to show that $s = \ab{c,t,c,t} \in traces(Sx)$. First we define the
+trace of $Sx$:
+\begin{align*}
+    Sx &= (\underbrace{V \cc R}_{Sx'}) \cc T2 & \\
+    traces(Sx') &= \sN{t \ch (t \filter \alpha V) \in traces(V) \land
+                            (t \filter \alpha R) \in traces(R) \land
+                             t \in (\alpha V \cup \alpha R)^*} & [2.3.3,~L1] \\
+    traces(Sx) &= \sN{t \ch (t \filter \alpha Sx') \in traces(Sx') \land
+                            (t \filter \alpha T2) \in traces(T2) \land
+                             t \in (\alpha Sx' \cup \alpha T2)^*} & [2.3.3,~L1] \\
+    s \filter \alpha V &= \ab{c,c} & [1.6.2,~L1-L4] \\
+    s \filter \alpha R &= \ab{c,t,c,t} & [1.6.2,~L1-L4] \\
+    s \filter \alpha Sx' &= \ab{c,t,c,t} & [1.6.2,~L1-L4] \\
+    s \filter \alpha T2 &= \ab{ } & [1.6.2,~L1-L4]
+\end{align*}
+The four restricted traces are computed using the restriction laws and the
+details are left out since I found them too simple and cumbersome to describe in
+details.
+
+Proving that these last traces are part of their respective processes is enough
+to show that $s \in tractes(Sx)$. Once again we will use the shorthand notation
+$V / s'$ to denote the process $V$ after a trace $s' \in traces(V)$.
+\begin{align*}
+    traces(V) &= \sN{\ab{ } } \cup \sN{\ab{c} \cat t \ch t \in traces(V /
+    \ab{c})} & [1.8.1,~L2] \\
+    traces(V/\ab{c}) &= \sN{\ab{ }}
+        \cup \sN{\ab{p} \cat t \ch t \in traces(V / \ab{c,p})}
+        \cup \sN{\ab{c} \cat t \ch t \in traces(V / \ab{c,c})} & [1.8.1,~L3] \\
+    traces(V) &\supseteq \sN{\ab{ }, \ab{c}, \ab{c,p}, \ab{c,c}} \\
+    (s \filter \alpha V) &\in traces(V)
+\end{align*}
+
+\begin{align*}
+    traces(R) &= \sN{\ab{ }}
+        \cup \sN{\ab{c} \cat t \ch traces(R/\ab{c})} & [1.8.1,~L2] \\
+    traces(R/\ab{c}) &= \sN{\ab{ }}
+        \cup \sN{\ab{t} \cat t \ch traces(R/\ab{c,t})} & [1.8.1,~L2] \\
+    traces(R/\ab{c,t}) &= \sN{\ab{ }}
+        \cup \sN{\ab{c} \cat t \ch traces(R/\ab{c,t,c})} & [1.8.1,~L2] \\
+    traces(R/\ab{c,t,c}) &= \sN{\ab{ }}
+        \cup \sN{\ab{t} \cat t \ch traces(R/\ab{c,t,c,t})} & [1.8.1,~L2] \\
+    traces(R) &\supseteq \sN{\ab{ }, \ab{c}, \ab{c,t}, \ab{c,t,c}, \ab{c,t,c,t}}
+    \\
+    (s \filter \alpha R) &\in traces(R)
+\end{align*}
+Furthermore the statement $(s \filter \alpha Sx') \in (\alpha V \cup \alpha R)^*$ holds since $(\alpha
+V \cup \alpha R) = \alpha Sa = \sN{c,p,s,t}$ and hence we have shown that
+$s \in traces(Sx')$. Furthermore $s \in (\alpha Sx' \cup \alpha T2)^*$ since
+$(\alpha Sx' \cup \alpha T2) = \alpha Se = \sN{c,p,s,t}$.
+
+Since $Sx$ is defined using $Sx'$, all which is left to show is
+that $(s \filter \alpha T2) \in traces(T2)$ holds. This is however trivial since
+$s \filter \alpha T2 = \ab{}$. The empty trace is always in the trace of
+a process by [1.8.1,~L6] and hence we have shown that $s \in traces(Sx)$.
+
+\subsection{$Sy = Sx/s$}
+We first compute $Sy = Sx/s$:
+\begin{align*}
+    Sx &= (V \cc R) \cc T2 & \\
+    Sy &= Sx/s = ((V/(s \filter \alpha V))
+                \cc (R/(s \filter \alpha R))
+                \cc (T2/(s \filter \alpha T2)))
+                & 2\times[2.3.3,~L2] \\
+    &s \filter \alpha V = \ab{c,c},
+    ~~ s \filter \alpha R = \ab{c,t,c,t},
+    ~~ s \filter \alpha R2 = \ab{ } & \text{(as in 3c)} \\
+    V/\ab{c,c} &= (V / \ab{c}) / \ab{c} & [1.8.3,~L2] \\
+               &= s \ra VM & 2 \times [1.8.3,~L3A] \\
+    R/\ab{c,t,c,t} &= ( ( (R / \ab{c}) / \ab{t} ) / \ab{c} ) / \ab{t} & 3 \times
+    [1.8.3,~L2] \\
+    &= c \ra t \ra R & 4 \times [1.8.3,~L3A] \\
+    T2 / \ab{ } &= T2 = p \ra T2 & [1.8.3,~L1]
+\end{align*}
+The next step of this question is to show for each of the events $x \in
+\sN{c,p,s,t}$ that $\ab{x} \not \in traces(Sy)$.
+\begin{align*}
+    traces(Sy) &= traces(\underbrace{((V/\ab{c,c})
+                \cc (R/\ab{c,t,c,t}))}_{Sy'}
+                \cc (T2/\ab{ }))
+                & \\
+    traces(Sy') &= \sN{t \ch
+                    (t \filter \alpha V) \in traces(V / \ab{c,c}) \land
+                    (t \filter \alpha R) \in traces(R / \ab{c,t,c,t}) \land
+                    t \in (\alpha V \cup \alpha R)^*
+                } & [2.3.3,~L1] \\
+    traces(Sy) &= \sN{ t \ch
+                    (t \filter \alpha Sy') \in traces(Sy') \land
+                    (t \filter \alpha T2) \in traces(T2) \land
+                    t \in (\alpha Sy' \cup \alpha R)^*
+                  } & [2.3.3,~L1]
+\end{align*}
+When prooving that none of the singleton traces $\ab{x}$ for $x \in
+\sN{c,p,s,t}$ are part of the trace of $Sy$, we need to derrive the set of
+traces with a length of exactly one to leave out the possiblity of $\ab{x}$
+being a part of the traces. These sets of traces are:
+\begin{align*}
+    traces(V/\ab{c,c}) &= \sN{\ab{ }} \cup
+        \sN{\ab{s} \cat t \ch traces(V/\ab{c,c,s})} & [1.8.1,~L2] \\
+    traces(R/\ab{c,t,c,t}) &= \sN{\ab{ }} \cup
+    \sN{\ab{c} \cat t \ch traces(R/\ab{c,t,c,t,c})} & [1.8.1,~L2] \\
+    traces(T2) &= \sN{\ab{ }} \cup
+    \sN{\ab{p} \cat t \ch traces(T2/\ab{p})} & [1.8.1,~L2]
+\end{align*}
+After these expansions of the traces, the traces will only become longer and
+hence we stop the trace ``search'' here.
+
+For $x = c$ we have:
+\begin{align*}
+    \ab{c} \filter \alpha V &= \ab{c},~~
+    \ab{c} \filter \alpha R = \ab{c},~~
+    \ab{c} \filter \alpha T2 = \ab{ }
+\end{align*}
+Since $\ab{c} \not \in traces(V/\ab{c,c})$, we have shown that $\ab{c} \not \in
+traces(Sy')$ and hence $\ab{c} \not \in traces(Sy)$.
+
+For $p$ and $s$ we have:
+\begin{align*}
+    \ab{p} \filter \alpha V = \ab{p},~~
+    \ab{p} \filter \alpha R = \ab{ },~~
+    \ab{p} \filter \alpha T2 = \ab{p} \\
+    \ab{s} \filter \alpha V = \ab{p},~~
+    \ab{s} \filter \alpha R = \ab{ },~~
+    \ab{s} \filter \alpha T2 = \ab{p}
+\end{align*}
+Since $\ab{p} \not \in traces(V/\ab{c,c})$, we have the same argument as above
+and hence $\ab{p} \not \in traces(Sy)$ and $\ab{s} \not \in traces(Sy)$.
+
+Looking at $t$:
+\begin{align*}
+    \ab{t} \filter \alpha V = \ab{ },~~
+    \ab{t} \filter \alpha R = \ab{t},~~
+    \ab{t} \filter \alpha T2 = \ab{ }
+\end{align*}
+We here have that $\ab{t} \not \in traces(R/\ab{c,t,c,t})$ and hence $\ab{t}
+\not \in traces(Sy')$ and therefore $\ab{t} \not \in traces(Sy)$ and thus we
+have completed the question.
+
 
 \end{document}
