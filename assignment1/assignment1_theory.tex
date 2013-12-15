@@ -30,6 +30,11 @@
 \maketitle
 
 \section{Satisfiability proof}
+Note: Throughout this proof I have intendedly left out the references for the
+length laws from section 1.6.6, which result in the definition of the number of
+occurences of a symbol in a trace. I have chosen to do this to avoid cluttering
+the proof with insignificant and very simple derrivations.
+
 We are in this question asked to proove the following satisfiability statement:
 \begin{align*}
     V \sat (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) \leq 2 
@@ -69,7 +74,14 @@ trace:
     \ab{} \count c &= \ab{} \count p = \ab{} \count s = 0 \\
     \ab{s} \count s &= 1,~~ \ab{s} \count c = \ab{s} \count p = 0
 \end{align*}
-We know that $S(tr')$ is satisfied and need to show that $S'(tr)$ is satisfied: 
+We know that $S(tr')$ is satisfied and need to show that $S'(tr)$ is satisfied.
+For $tr = \ab{}$ we have:
+\begin{align*}
+    (\ab{ } \count c) - (\ab{ } \count p) - 2 \cdot (\ab{ } \count s) &= 0
+    \Rightarrow \\
+    (\ab{ } \count c) - (\ab{ } \count p) - 2 \cdot (\ab{ } \count s) &\leq 0
+\end{align*}
+For $tr_0 = \ab{s}$ we have: 
 \begin{align*}
     (tr \count s) &= (\ab{s} \cat tr' \count s) = 1 + (tr \count s) \\
     (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
@@ -96,9 +108,11 @@ Again we introduce a new inequality $S''$:
 And count the occurences of events:
 \begin{align*}
         \ab{p} \count c &= \ab{p} \count s = 0,~~ \ab{p} \count p = 1 \\
-        \ab{c} \count p &= \ab{c} \count s = 0,~~ \ab{c} \count c = 1 \\
+        \ab{c} \count p &= \ab{c} \count s = 0,~~ \ab{c} \count c = 1
 \end{align*}
-We know that $S(tr')$ is satisfied and check the implication of $S''(tr)$ for the event $p$ (the case of $tr_0 = p$):
+We know that $S(tr')$ is satisfied and check that $S''(tr)$ is satisfied as
+well. Since $S''(tr)$ is a weaker inequality than $S'(tr)$, we know that
+$S''(\ab{ })$ is satisfied since $S'(\ab{ })$ is. For $tr_0 = p$ we have:
 \begin{align*}
         (tr \count p) &= (\ab{p} \cat tr' \count p) = 1 + (tr' \count p) \\
     (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
@@ -110,7 +124,8 @@ We know that $S(tr')$ is satisfied and check the implication of $S''(tr)$ for th
         \Leftrightarrow \\
         (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &\leq 1
 \end{align*}
-So $S''(tr)$ is satisfied for $tr_0 = p$. We need to check for satisfaction of the event $c$ as
+So $S''(tr)$ is satisfied for $tr_0 = p$. We need to check for satisfaction of
+$tr_0 = c$ as
 well. Remember for this choice we had $(s \ra V) \sat S'(tr)$:
 \begin{align*}
     (tr \count c) &= (\ab{c} \cat tr' \count c) = 1 + (tr' \count c) \\
@@ -122,9 +137,10 @@ well. Remember for this choice we had $(s \ra V) \sat S'(tr)$:
     \Leftrightarrow \\
     (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &\leq 1
 \end{align*}
-Hence $S''(tr)$ is satisfied for $tr_0 = c$ as well. Since $S''(tr)$ is is
-satisfied for both $tr_0 = p$ and $tr_0 = c$, it is satisfied for the choice
-between the two events.
+Hence $S''(tr)$ is satisfied for $tr_0 = c$ as well. Since $S''(tr)$ is
+satisfied for both $tr = \ab{ }$, $tr_0 = p$, and $tr_0 = c$, it is satisfied for the choice
+between the two events (by [1.10.2,~L4D] as stated in the beginning of this
+step).
 
 The last part of the satisfaction proof is to look at $c \ra (p \ra V \ch c \ra
 s \ra V)$.
@@ -132,10 +148,12 @@ s \ra V)$.
     c \ra (p \ra V \ch c \ra s \ra V) &\sat (
         tr = \ab{ } \lor
         (tr_0 = c \land S''(tr'))
-        ) & [1.10.2,~L4B] \\
+        ) & [1.10.2,~L4B]
 \end{align*}
 Since this is the last step, we simply want to check that $S(tr)$ is satisfied
-(The first couple of calculations are similar to the ones above).
+(The first couple of calculations are similar to the ones above). Once again
+$S(\ab{ })$ is trivially satisfied because $S(tr)$ is a weaker inequality than $S'(tr)$. For
+$tr_0 = c$ we have:
 \begin{align*}
     (tr \count c) &= (\ab{c} \cat tr' \count c) = 1 + (tr' \count c) \\
     (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
@@ -149,7 +167,7 @@ Since this is the last step, we simply want to check that $S(tr)$ is satisfied
 And hence $S(tr)$ is satisfied. This is however only the case since $S'(tr)$ and
 $S''(tr)$ ($tr$ referring to the traces when they were defined) each imply that
 $S(tr)$ is satisfied by [1.10.1,~L3] since $S(tr)$ is a weaker inequality than
-each of the two defined. Furthermore we need law [1.10.2,~L6] to conclude that
+each of $S'(tr)$ and $S''(tr)$. Furthermore we need law [1.10.2,~L6] to conclude that
 the induction proof is indeed done and that $S(tr)$ has been prooved to be
 satisfied by $V$.
 
@@ -183,11 +201,11 @@ satisfied by $V$.
                   \right) & [2.3.1,~L5B] \\
        &= c \ra \left( p \ra (t \ra Sa)
                   \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
-                  \ch s \ra ( t \ra (R \cc V))))
+                  \ch s \ra t \ra (R \cc V)))
                   \right) & [2.3.1,~L5A] \\
        &= c \ra \left( p \ra (t \ra Sa)
                   \ch t \ra ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
-                  \ch s \ra (t \ra Sa)))
+                  \ch s \ra t \ra Sa))
                   \right)
 \end{align*}
 
@@ -195,13 +213,13 @@ satisfied by $V$.
 
 \begin{align*}
     \alpha \left( Sb \right) &= \alpha(Sa) \cup \alpha(T1) = \sN{c,p,s,t} \\
-    sb &= (c \ra \left( p \ra (t \ra sa)
+    Sb &= (c \ra \left( p \ra (t \ra sa)
                   \ch t \ra ( p \ra sa \ch c \ra (t \ra (s \ra sa)
-                  \ch s \ra (t \ra sa)))
+                  \ch s \ra t \ra sa))
                   \right)) \cc (s \ra t1) & \\
        &= c \ra (\left( p \ra (t \ra sa)
                   \ch t \ra ( p \ra sa \ch c \ra (t \ra (s \ra sa)
-                  \ch s \ra (t \ra sa)))
+                  \ch s \ra t \ra sa))
                   \right) \cc (s \ra t1)) & [2.3.1,~L5A] \\
        A &=\sN{p,t},~~B=\sN{s},~~C=\sN{t} & [2.3.1,~L7] \\
     Sb &= c \ra t \ra ( ( p \ra Sa \ch c \ra (t \ra (s \ra Sa)
@@ -217,9 +235,9 @@ satisfied by $V$.
        &= c \ra t \ra c \ra (t \ra (s \ra Sa \cc T1)
                   \ch s \ra ((t \ra Sa) \cc T1)) & [2.3.1,~L4A] \\
        &= c \ra t \ra c \ra (t \ra (s \ra Sb)
-                  \ch s \ra (t \ra Sa \cc T1)) & [2.3.1,~L5A] \\
+                  \ch s \ra t \ra (Sa \cc T1)) & [2.3.1,~L5A] \\
        &= c \ra t \ra c \ra (t \ra (s \ra Sb)
-                  \ch s \ra (t \ra Sb)) & \\
+                  \ch s \ra t \ra Sb) & \\
 \end{align*}
 
 \subsection{$Sc = R \cc T1$}
@@ -266,9 +284,9 @@ satisfied by $V$.
             (c \ra (t \ra Sc \ch s \ra Sc')) \ch s \ra Sc)) & \\
      A &= \sN{s},~~ B = \sN{c,s},~~ C = \sN{s} & [2.3.1,~L7] \\
     Sd &= c \ra t \ra c \ra
-            (s \ra (t \ra Sd) \ch t \ra (s \ra (V \cc Sc))) & \\
+            (s \ra (t \ra Sd) \ch t \ra s \ra (V \cc Sc)) & \\
        &= c \ra t \ra c \ra
-            (s \ra (t \ra Sd) \ch t \ra (s \ra Sd)) & \\
+            (s \ra (t \ra Sd) \ch t \ra s \ra Sd) & \\
 \end{align*}
 This result is similar to that of 2(b). This was however expected as [2.2.1,~L2]
 says that concurrent composition is associative and the processes from 2(b) and
@@ -312,11 +330,11 @@ concurrently.
                       \right) & \\
      A &= \sN{t,s},~~ B = \sN{p},~~ C = \sN{t} & [2.3.1,~L7] \\
     Se &= c \ra \left( p \ra (t \ra Se)
-                  \ch t \ra ( p \ra Se \ch c \ra (t \ra ((s \ra Sa) \cc (p \ra
-                  T2))))
+                  \ch t \ra ( p \ra Se \ch c \ra t \ra ((s \ra Sa) \cc (p \ra
+                  T2)))
                       \right) & \\
        &= c \ra \left( p \ra (t \ra Se)
-                  \ch t \ra ( p \ra Se \ch c \ra (t \ra STOP))
+                  \ch t \ra ( p \ra Se \ch c \ra t \ra STOP)
                   \right) & [2.3.1,~L4B] \\
 \end{align*}
 
@@ -355,14 +373,14 @@ concurrently.
              (t \ra f(Sc) \ch p \ra f(Sc)))) & \\
         A &= \sN{s},~~ B = \sN{t,p},~~ C = \sN{t} & [2.3.1,~L7] \\
     Sf'   &= (p \ra Sf  \ch
-              c \ra (t \ra ((s \ra V) \cc f(Sc)))) & \\
+              c \ra t \ra ((s \ra V) \cc f(Sc))) & \\
           &= (p \ra Sf  \ch
-              c \ra (t \ra ((s \ra V) \cc
-                            (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc))))) & \\
+              c \ra t \ra ((s \ra V) \cc
+                            (c \ra (t \ra f(Sc) \ch p \ra f(Sc')) \ch p \ra f(Sc)))) & \\
         A &= \sN{s},~~ B = \sN{c,p},~~ C = \sN{ } & [2.3.1,~L7] \\
-    Sf'   &= (p \ra Sf \ch c \ra (t \ra STOP)) & \\
+    Sf'   &= (p \ra Sf \ch c \ra t \ra STOP) & \\
     Sf &= c \ra (p \ra (t \ra Sf)
-            \ch t \ra  (p \ra Sf \ch c \ra (t \ra STOP))) & \\
+            \ch t \ra  (p \ra Sf \ch c \ra t \ra STOP)) & \\
 \end{align*}
 This result is similar to that of 2(e) as expected. The change of symbols made
 by $f(Sc)$ changes $Sc$ into $R \cc T2$ and hence we have the same basic
@@ -396,7 +414,7 @@ to shorten the prooflines I have chosen to use rules [1.8.3,~L3A] and
 
 \begin{align*}
     Se &= c \ra \left( p \ra (t \ra Se)
-                  \ch t \ra ( p \ra Se \ch c \ra (t \ra STOP))
+                  \ch t \ra ( p \ra Se \ch c \ra t \ra STOP)
                   \right) & \\
     traces(Se) &= \sN{\ab{ }} \cup \sN{\ab{c} \cat t \ch
                       t \in traces(Se / \ab{c})} & [1.8.1,~L2] \\
@@ -407,7 +425,7 @@ to shorten the prooflines I have chosen to use rules [1.8.3,~L3A] and
                         \cup \sN{\ab{t} \cat t \ch t \in traces(Se/\ab{c,t})} & \\
     traces(Se/\ab{c,t}) &= \sN{\ab{ }} \cup
                            \sN{\ab{p} \cat t \ch t \in traces(Se/\ab{c,t,p})} \cup
-                           \sN{\ab{c} \cat t \ch t \in traces(Se/\ab{c,t,c}}
+                           \sN{\ab{c} \cat t \ch t \in traces(Se/\ab{c,t,c})}
                            & [1.8.1,~L3] \\
     traces(Se/\ab{c,t,c}) &= \sN{\ab{ }} \cup
                              \sN{\ab{t} \cat t \ch t \in
@@ -557,6 +575,5 @@ Looking at $t$:
 We here have that $\ab{t} \not \in traces(R/\ab{c,t,c,t})$ and hence $\ab{t}
 \not \in traces(Sy')$ and therefore $\ab{t} \not \in traces(Sy)$ and thus we
 have completed the question.
-
 
 \end{document}
