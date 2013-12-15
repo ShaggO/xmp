@@ -15,7 +15,9 @@
 \def\ic{\,\sqcap\,}
 \def\co{\backslash}
 \def\cat{^{\frown}}
+\def\count{\,\downarrow\,}
 \def\filter{\,\upharpoonright\,}
+\def\sat{\,\textbf{sat}\,}
 \newcommand{\ab}[1]{\left \langle #1 \right \rangle}
 \newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
 
@@ -28,8 +30,128 @@
 \maketitle
 
 \section{Satisfiability proof}
+We are in this question asked to proove the following satisfiability statement:
+\begin{align*}
+    V \sat (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) \leq 2 
+\end{align*}
+This is done by creating an induction proof over the trace $tr$. The basis step
+is: $STOP$
+\begin{align*}
+    STOP \sat tr &= \ab{ } & [1.10.2,~L4A] \\
+                 & \Rightarrow (tr \count c) - (tr \count p) - 2 \cdot (tr
+                 \count s) \leq 2
+\end{align*}
+Since $(\ab{ } \count c) = (\ab{ } \count p) = (\ab{ } \count s) = 0$. By using
+[1.10.1,~L3] the equation holds for the basis step.
 
+The next part of the proof is the induction step. We assume that:
+\begin{align*}
+    V \sat (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) \leq 2 
+\end{align*}
+And need to show that this is likewise the case for another step of the
+recursion on $V$. We will build up the proof ``backwards'' by starting at each
+of the two $V$s below and continue until we have proven the satisfiability of
+the inequality for the entire process:
+\begin{align*}
+    c \ra (p \ra V \ch c \ra s \ra V)
+\end{align*}
+We start out by looking at the right-most event ($s \ra V$):
+\begin{align*}
+    (s \ra V) &\sat (tr = \ab{ } \lor (tr_0 = s \land S(tr'))) & [1.10.2,~L4B]
+\end{align*}
+And introduce the inequality:
+\begin{align*}
+    S'(tr) &= (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) \leq 0
+\end{align*}
+In order to show that this holds, we first count the number of each event in the
+trace:
+\begin{align*}
+    \ab{} \count c &= \ab{} \count p = \ab{} \count s = 0 \\
+    \ab{s} \count s &= 1,~~ \ab{s} \count c = \ab{s} \count p = 0
+\end{align*}
+We know that $S(tr')$ is satisfied and need to show that $S'(tr)$ is satisfied: 
+\begin{align*}
+    (tr \count s) &= (\ab{s} \cat tr' \count s) = 1 + (tr \count s) \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
+        (tr' \count c) - (tr' \count p) - 2 \cdot (1+(tr' \count s))\\
+        &= (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s)-2\\
+    (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) &\leq 2
+        \Leftrightarrow \\
+        (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &\leq 0
+\end{align*}
+So $S'(tr)$ is satisfied in this step.
 
+Taking the next part of the process: $(p \ra V \ch c \ra (s \ra V))$:
+\begin{align*}
+    (p \ra V \ch c \ra (s \ra V)) &\sat (
+        tr = \ab{ } \lor
+        (tr_0 = p \land S(tr')) \lor
+        (tr_0 = c \land S'(tr'))
+        ) & [1.10.2,~L4D]
+\end{align*}
+Again we introduce a new inequality $S''$:
+\begin{align*}
+    S''(tr) = (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) \leq 1 
+\end{align*}
+And count the occurences of events:
+\begin{align*}
+        \ab{p} \count c &= \ab{p} \count s = 0,~~ \ab{p} \count p = 1 \\
+        \ab{c} \count p &= \ab{c} \count s = 0,~~ \ab{c} \count c = 1 \\
+\end{align*}
+We know that $S(tr')$ is satisfied and check the implication of $S''(tr)$ for the event $p$ (the case of $tr_0 = p$):
+\begin{align*}
+        (tr \count p) &= (\ab{p} \cat tr' \count p) = 1 + (tr' \count p) \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
+        (tr' \count c) - (1+(tr' \count p)) - 2 \cdot (tr' \count s) \\
+        &= (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) -1 \\
+(tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) &\leq 2 \Leftrightarrow
+\\
+        (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) -1 &\leq 1
+        \Leftrightarrow \\
+        (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &\leq 1
+\end{align*}
+So $S''(tr)$ is satisfied for $tr_0 = p$. We need to check for satisfaction of the event $c$ as
+well. Remember for this choice we had $(s \ra V) \sat S'(tr)$:
+\begin{align*}
+    (tr \count c) &= (\ab{c} \cat tr' \count c) = 1 + (tr' \count c) \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
+        1 + (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count p) \\
+    (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count p) &\leq 0
+    \Leftrightarrow \\
+    (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) +1 &\leq 1
+    \Leftrightarrow \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &\leq 1
+\end{align*}
+Hence $S''(tr)$ is satisfied for $tr_0 = c$ as well. Since $S''(tr)$ is is
+satisfied for both $tr_0 = p$ and $tr_0 = c$, it is satisfied for the choice
+between the two events.
+
+The last part of the satisfaction proof is to look at $c \ra (p \ra V \ch c \ra
+s \ra V)$.
+\begin{align*}
+    c \ra (p \ra V \ch c \ra s \ra V) &\sat (
+        tr = \ab{ } \lor
+        (tr_0 = c \land S''(tr'))
+        ) & [1.10.2,~L4B] \\
+\end{align*}
+Since this is the last step, we simply want to check that $S(tr)$ is satisfied
+(The first couple of calculations are similar to the ones above).
+\begin{align*}
+    (tr \count c) &= (\ab{c} \cat tr' \count c) = 1 + (tr' \count c) \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) &=
+        1 + (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) \\
+    (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count p) &\leq 1
+    \Leftrightarrow \\
+    (tr' \count c) - (tr' \count p) - 2 \cdot (tr' \count s) +1 & \leq 2
+    \Leftrightarrow \\
+    (tr \count c) - (tr \count p) - 2 \cdot (tr \count s) & \leq 2
+\end{align*}
+And hence $S(tr)$ is satisfied. This is however only the case since $S'(tr)$ and
+$S''(tr)$ ($tr$ referring to the traces when they were defined) each imply that
+$S(tr)$ is satisfied by [1.10.1,~L3] since $S(tr)$ is a weaker inequality than
+each of the two defined. Furthermore we need law [1.10.2,~L6] to conclude that
+the induction proof is indeed done and that $S(tr)$ has been prooved to be
+satisfied by $V$.
 
 \section{Derrivation of process definitions}
 \subsection{$a = V \cc R$}
@@ -148,6 +270,10 @@
        &= c \ra t \ra c \ra
             (s \ra (t \ra Sd) \ch t \ra (s \ra Sd)) & \\
 \end{align*}
+This result is similar to that of 2(b). This was however expected as [2.2.1,~L2]
+says that concurrent composition is associative and the processes from 2(b) and
+2(d) are built from the same set of basic processes being run together
+concurrently.
 
 \subsection{$Se = Sa \cc T2$}
 
@@ -238,6 +364,9 @@
     Sf &= c \ra (p \ra (t \ra Sf)
             \ch t \ra  (p \ra Sf \ch c \ra (t \ra STOP))) & \\
 \end{align*}
+This result is similar to that of 2(e) as expected. The change of symbols made
+by $f(Sc)$ changes $Sc$ into $R \cc T2$ and hence we have the same basic
+processes being run concurrently here in 2(f) as we had in 2(e).
 
 \section{Processes and deadlocking}
 
