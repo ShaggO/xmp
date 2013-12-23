@@ -1,16 +1,17 @@
 import sys
 from pycsp.greenlets import *
+import notifications
 import time
 # Player process
 @process
-def player(cout, cin):
+def player(cout, cin, cnote):
     cmd = ''
+    Spawn(notifications.receiver(cnote,True))
 
     while cmd != 'exit':
 
         # New iteration
         cmd = getCmd()
-
         cout(cmd)
         ret = cin()
         if cmd == 'look':

@@ -3,39 +3,43 @@ from pycsp.greenlets import *
 
 
 ##### Initialize player
-pChans = Channel() * 8
+pChans = Channel() * 12
 pObjects = []
 # Initialize player objects for the world
 pObjects.append({
     'name':  'Malte',
     'cin':   pChans[0].reader(),
     'cout':  pChans[1].writer(),
+    'cnote': pChans[2].writer(),
     'items': ['gold','frankincense','myrrh']})
 
 pObjects.append({
     'name':  'Agent #0',
-    'cin':   pChans[2].reader(),
-    'cout':  pChans[3].writer(),
+    'cin':   pChans[3].reader(),
+    'cout':  pChans[4].writer(),
+    'cnote': pChans[5].writer(),
     'items': []})
 
 pObjects.append({
     'name':  'Agent #1',
-    'cin':   pChans[4].reader(),
-    'cout':  pChans[5].writer(),
+    'cin':   pChans[6].reader(),
+    'cout':  pChans[7].writer(),
+    'cnote': pChans[8].writer(),
     'items': []})
 
 pObjects.append({
     'name':  'Agent #2',
-    'cin':   pChans[6].reader(),
-    'cout':  pChans[7].writer(),
+    'cin':   pChans[9].reader(),
+    'cout':  pChans[10].writer(),
+    'cnote': pChans[11].writer(),
     'items': []})
 
 # Initialize player processes
 pAgents = []
-pAgents.append(player.player(pChans[0].writer(), pChans[1].reader()))
-pAgents.append(agent.agent(pChans[2].writer(), pChans[3].reader(), 'Agent #0'))
-pAgents.append(agent.agent(pChans[4].writer(), pChans[5].reader(), 'Agent #1'))
-pAgents.append(agent.agent(pChans[6].writer(), pChans[7].reader(), 'Agent #2'))
+pAgents.append(player.player(-pChans[0], +pChans[1], +pChans[2]))
+pAgents.append(agent.agent(-pChans[3], +pChans[4], +pChans[5], 'Agent #0'))
+pAgents.append(agent.agent(-pChans[6], +pChans[7], +pChans[8], 'Agent #1'))
+pAgents.append(agent.agent(-pChans[9], +pChans[10], +pChans[11], 'Agent #2'))
 
 
 ##### Initialize world
