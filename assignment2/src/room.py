@@ -18,8 +18,10 @@ def room(name, cin, neighbours, players = None, desc = '', items = None):
                 )
             if chan == cin:
                 player = message
-                Spawn(notifications.sender([p['cnote'] for p in
-                players],('enters',player['name'])))
+                Spawn(
+                    notifications.sender([p['cnote'] for p in players],
+                    ('enters',player['name']))
+                )
                 players.append(player)
 
             else:
@@ -36,8 +38,10 @@ def room(name, cin, neighbours, players = None, desc = '', items = None):
                     if nChan is not None:
                         players.remove(player)
                         Spawn(moveAgent(nChan, player))
-                        Spawn(notifications.sender([p['cnote'] for p in
-                            players],('leaves',player['name'])))
+                        Spawn(
+                            notifications.sender([p['cnote'] for p in players],
+                            ('leaves',player['name']))
+                        )
 
                 elif cmd == 'look':
                     ret = (name, desc, players, items)

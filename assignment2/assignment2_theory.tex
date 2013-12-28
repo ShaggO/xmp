@@ -1,0 +1,138 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[
+    top     =   1in,
+    right   = 0.5in,
+    bottom  =   1in,
+    left    = 0.5in]{geometry}
+
+\usepackage{amsmath,amssymb,amsfonts}
+
+\def\ra{\rightarrow}
+\def\cc{\,\|\,}
+\def\gc{\,\square\,}
+\def\ch{\,|\,}
+\def\ic{\,\sqcap\,}
+\def\co{\backslash}
+\def\cat{^{\frown}}
+\def\count{\,\downarrow\,}
+\def\filter{\,\upharpoonright\,}
+\def\sat{\,\textbf{sat}\,}
+\def\hide{\,\setminus\,}
+\def\wr{\,!\,}
+\def\re{\,?\,}
+\def\after{\,/\,}
+\newcommand{\chan}[1]{\textbf{#1}}
+\newcommand{\ab}[1]{\left \langle #1 \right \rangle}
+\newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
+\newcommand{\abs}[1]{\left | #1 \right |}
+
+\renewcommand{\thesubsection}{\thesection.\alph{subsection}}
+
+\title{Extreme Multiprogramming\\Assignment 2 - theory}
+\author{Malte Stær Nissen\\ \texttt{tgq958}}
+
+\begin{document}
+\maketitle
+
+\section{Equivalent definition of $NET$}
+
+The assignment is to expand the following definition of $NET$ until it doesn't
+contain any concealment, general choice or concurrent composition:
+\begin{align*}
+    STORE_x &\overset{\Delta}{=}(\chan{add} \re y \ra STORE_{x+y})
+                                 \gc (\chan{fetch} \wr x \ra STORE_{x-1}) \\
+    NET &=(STORE_{10} \cc (\chan{add} \wr 3 \ra STOP_A)) \hide A
+\end{align*}
+We first introduce the following auxilary processes $FETCH_x$ and $NETA_x$:
+\begin{align*}
+ FETCH_x &= STORE_x \cc STOP_A \\
+ &= ( (\chan{add} \re y \ra STORE_{x+y}) \gc (\chan{fetch} \wr x \ra
+ STORE_{x-1}) ) \cc STOP_A
+            \\
+        A &= \sN{\abs{\chan{add}}},~~ B = \sN{\chan{fetch}\wr x},~~ A \cap B =
+        \sN{ } & [3.3.1,~L5] \\
+ FETCH_x &= ( (\chan{add} \re y \ra STORE_{x+y} \ch \chan{fetch} \wr x \ra
+ STORE_{x-1}) ) \cc STOP_A
+            \\
+            A &= \sN{\abs{\chan{add}}, \chan{fetch} \wr x},~~ B = \sN{ },~~ C
+        = \sN{\chan{fetch} \wr x} & [2.3.1,~L7] \\
+ FETCH_x &= \chan{fetch} \wr x \ra (STORE_{x-1} \cc STOP_A) \\
+           &= \chan{fetch} \wr x \ra FETCH_{x-1} \\ \\
+  NETA_x &= STORE_x \cc (\chan{add} \wr 3 \ra STOP_A) \\
+         &= ((\chan{add} \re y \ra STORE_{x+y}) \gc (\chan{fetch} \wr x \ra
+           STORE_{x-1})) \cc (\chan{add} \wr 3 \ra STOP_A) & \\
+       A &= \sN{\abs{\chan{add}}},~~ B = \sN{\chan{fetch} \wr x},
+       ~~ A \cap B = \sN{ } & [3.3.1,~L5] \\
+       NETA_x &= (\chan{add} \re y \ra STORE_{x+y} \ch \chan{fetch} \wr x \ra
+       STORE_{x-1}) \cc (\chan{add} \wr 3 \ra STOP_A) & \\
+       A &= \sN{\abs{\chan{add}}, \chan{fetch}\wr x},~~ B = \sN{\chan{add}\wr3},~~
+       C = \sN{\chan{add}.3, \chan{fetch} \wr x} & [2.3.1,~L7] \\
+  NETA_x &= (\chan{add}.3 \ra (STORE_{x+3} \cc STOP_A) \ch
+             \chan{fetch} \wr x \ra (STORE_{x-1} \cc (\chan{add} \wr 3 \ra
+             STOP_A))) \\
+         &= (\chan{add}.3 \ra FETCH_{x+3} \ch
+         \chan{fetch} \wr x \ra NETA_{x-1})
+\end{align*}
+Which we now use the two defined processes above to define a process $NET_x$
+similar to $NET$ but taking a start variable $x \in \mathbb{Z}$ as input:
+\begin{align*}
+    NET_x &=(STORE_x \cc (\chan{add} \wr 3 \ra STOP_A)) \hide A \\
+        &= NETA_x \hide A \\
+        &= (\chan{add}.3 \ra FETCH_{x+3} \ch \chan{fetch}\wr x \ra NETA_{x-1})
+        \hide A \\
+        C &= \sN{A},~~ B = \sN{\chan{add}.3, \chan{fetch}\wr x},~~
+        C \cap B = \sN{\chan{add}.3},~~B - C = \sN{\chan{fetch}\wr x}
+            & [3.5.1,~L10] \\
+    NET_x &= (\underbrace{FETCH_{x+3} \hide A}_{FETCH'_{x+3}}) \ic
+            ((FETCH_{x+3} \hide A) \gc
+            (\chan{fetch}\wr x \ra (NETA_{x-1} \hide A)
+            )) & \\
+    FETCH'_{x} &= FETCH_x \hide A \\
+               &= (\chan{fetch}\wr x \ra FETCH_{x-1}) \hide A \\
+               &= \chan{fetch} \wr x \ra (FETCH_{x-1} \hide A) & [3.5.1,~L8] \\
+               &= \chan{fetch} \wr x \ra FETCH'_{x-1} \\
+    NET_x &= FETCH'_{x+3} \ic
+             (FETCH'_{x+3} \gc
+              (\chan{fetch}\wr x \ra NET_{x-1}
+             )) & \\
+          &= FETCH'_{x+3} \ic
+             ((\chan{fetch} \wr (x+3) \ra FETCH'_{x+2}) \gc
+              (\chan{fetch}\wr x \ra NET_{x-1}
+             )) & \\
+    A &= \sN{\chan{fetch} \wr (x+3)},~~ B = \sN{\chan{fetch} \wr x} &
+            [3.3.1,~L5] \\
+    NET_x &= FETCH'_{x+3} \ic
+             (\chan{fetch} \wr (x+3) \ra FETCH'_{x+2} \ch
+              \chan{fetch} \wr x \ra NET_{x-1}
+             )
+\end{align*}
+This process is directly applicable to the $NET$ definition:
+\begin{align*}
+    NET &= NET_{10} \\
+        &= FETCH'_{13} \ic (\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+            \chan{fetch}\wr 10 \ra NET_{9})
+\end{align*}
+
+
+\section{Trace assignments}
+\begin{align*}
+    s = \ab{ \chan{fetch}.10, \chan{fetch}.12, \chan{fetch}.11}
+\end{align*}
+
+\subsection{$s \in traces(NET)$}
+
+\subsection{$NET \after s$}
+
+\section{Refusals of $NET$ and $NET \after s$}
+
+\subsection{Refusals of $NET$}
+
+\subsection{Refusals of $NET \after s$}
+
+\end{document}
+
