@@ -1,5 +1,4 @@
 from pycsp.greenlets import *
-import notifications
 import re
 import sys
 # Room process
@@ -18,9 +17,9 @@ def room(name, cin, neighbours, players = None, desc = '', items = None):
                 )
             if chan == cin:
                 player = message
-                Spawn(
-                    notifications.sender([p['cnote'] for p in players],
-                    ('enters',player['name']))
+                notifyPlayers(
+                        [p['cnote'] for p in players],
+                        ('enters',player['name'])
                 )
                 players.append(player)
 
@@ -38,9 +37,11 @@ def room(name, cin, neighbours, players = None, desc = '', items = None):
                     if nChan is not None:
                         players.remove(player)
                         Spawn(moveAgent(nChan, player))
-                        Spawn(
-                            notifications.sender([p['cnote'] for p in players],
-                            ('leaves',player['name']))
+
+                        # Notify other players in room
+                        notifyPlayers(
+                            [p['cnote'] for p in players],
+                            ('leaves',player['name'])
                         )
 
                 elif cmd == 'look':
@@ -73,6 +74,13 @@ def room(name, cin, neighbours, players = None, desc = '', items = None):
 @process
 def moveAgent(cout, msg):
     cout(msg)
+
+def notifyPlayers(players, message):
+    while len(players) > 0:
+        g,msg = AltSelect(
+            *[OutputGuard(c,msg=message) for c in players]
+        )
+        players.remove(g)
 
 def logPrint(name,msg):
     print('[%s]: %s' % (name, msg))

@@ -23,7 +23,6 @@ def player(cout, cin, cnote):
                 fString += '\n\t[%d]: %s' % (i, items[i])
             fString += '\nPlayers:'
             for p in players:
-                print(p['items'])
                 fString += '\n\t%s\tholding:\t%s' % (p['name'],', '.join(p['items']))
             print(fString)
             sys.stdout.flush()

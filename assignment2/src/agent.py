@@ -7,7 +7,6 @@ import time
 # Agent that moves around and is able to randomly pick up or drop items
 @process
 def agent(cout, cin, cnote, logName):
-    #cmds = ['look','exit','N','S','E','W']
     cmds = ['N','S','E','W']
     items = []
     Spawn(notifications.receiver(cnote,False))
