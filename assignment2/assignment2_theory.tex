@@ -6,9 +6,9 @@
 \usepackage{lmodern}
 \usepackage[
     top     =   1in,
-    right   = 0.5in,
+    right   = 0.05in,
     bottom  =   1in,
-    left    = 0.5in]{geometry}
+    left    = 0.05in]{geometry}
 
 \usepackage{amsmath,amssymb,amsfonts}
 
@@ -26,6 +26,7 @@
 \def\wr{\,!\,}
 \def\re{\,?\,}
 \def\after{\,/\,}
+\newcommand{\refusals}[1]{\text{refusals}\left ( #1 \right )}
 \newcommand{\chan}[1]{\textbf{#1}}
 \newcommand{\ab}[1]{\left \langle #1 \right \rangle}
 \newcommand{\sN}[1]{\left \lbrace #1 \right \rbrace}
@@ -38,6 +39,8 @@
 
 \begin{document}
 \maketitle
+
+\section{Initial notes}
 
 \section{Equivalent definition of $NET$}
 
@@ -107,9 +110,8 @@ similar to $NET$ but taking a start variable $x \in \mathbb{Z}$ as input:
     A &= \sN{\chan{fetch} \wr (x+3)},~~ B = \sN{\chan{fetch} \wr x} &
             [3.3.1,~L5] \\
     NET_x &= FETCH'_{x+3} \ic
-             (\chan{fetch} \wr (x+3) \ra FETCH'_{x+2} \ch
-              \chan{fetch} \wr x \ra NET_{x-1}
-             )
+             \underbrace{(\chan{fetch} \wr (x+3) \ra FETCH'_{x+2} \ch
+             \chan{fetch} \wr x \ra NET_{x-1})}_{NET'_x}
 \end{align*}
 This process is directly applicable to the $NET$ definition:
 \begin{align*}
@@ -120,19 +122,176 @@ This process is directly applicable to the $NET$ definition:
 
 
 \section{Trace assignments}
+We introduce the following trace $s$:
 \begin{align*}
     s = \ab{ \chan{fetch}.10, \chan{fetch}.12, \chan{fetch}.11}
 \end{align*}
 
 \subsection{$s \in traces(NET)$}
+To show that $s \in traces(NET)$, we will derrive the trace $u = s$ from the
+definition of $NET$ by letting $s$ guide the derrivations. The laws stated in
+the equations below are used for the reasoning in each line. When reasoning
+about $FETCH'_x$ we adhere from explicitly substituting $FETCH'_x$ by it's
+definition: $\chan{fetch}\wr x \ra FETCH'_{x-1}$ to shorten the lines:
+\begin{align*}
+    &s \in traces(NET) ~\text{if:} \\
+    &\hspace{1cm}s \in traces(FETCH'_{13}) ~\text{or} \\
+    &\hspace{1cm}s \in traces(
+    (\chan{fetch}\wr 13 \ra FETCH'_{12} \ch \chan{fetch} \wr 10 \ra NET_9)) &
+[3.2.3,~L1] \\
+&s \in traces((\chan{fetch}\wr 13 \ra FETCH'_{12} \ch \chan{fetch} \wr 10 \ra
+NET_9))~\text{if:} \\
+    &\hspace{1cm}\ab{\chan{fetch}.12, \chan{fetch}.11} \in
+    traces(NET_9) & [1.8.1,~L3] \\
+    &\ab{\chan{fetch}.12,\chan{fetch}.11} \in traces(NET_9) ~\text{if:} \\
+    &\hspace{1cm}\ab{\chan{fetch}.12,\chan{fetch}.11} \in traces(FETCH'_{12}) ~\text{or} \\
+    &\hspace{1cm}\ab{\chan{fetch}.12,\chan{fetch}.11} \in
+    traces((\chan{fetch}\wr 12 \ra FETCH'_{11} \ch \chan{fetch}\wr 9 \ra NET_8))
+    & [3.2.3,~L1] \\
+    &\ab{\chan{fetch}.12,\chan{fetch}.11} \in traces(FETCH'_{12}) ~\text{if:}\\
+    &\hspace{1cm}\ab{\chan{fetch}.11} \in traces(FETCH'_{11}) & [1.8.1,~L3] \\
+    &traces(FETCH'_{11}) = \sN{\ab{ }} \cup 
+    \sN{\ab{\chan{fetch}.11} \cat t \ch t \in traces(FETCH'_{10})}\\
+    &\hspace{1cm} \Rightarrow \ab{\chan{fetch}.11} \in traces(FETCH'_{11})
+    & [1.8.1,~L2] \\
+    &\hspace{1cm} \Rightarrow s \in traces(NET)
+\end{align*}
 
 \subsection{$NET \after s$}
+NOTE: When computing $FETCH'_x \after \ab{\chan{fetch}\wr x}$ where $x \in
+\mathbb{Z}$ I will adhere from explicitly expanding $FETCH'_x$ to $\chan{fetch}\wr
+x \ra FETCH'_{x-1}$ before reducing to $FETCH'_{x-1}$ in the following step to
+avoid cluttering the derrivations with this particular trivial substitution.
+\begin{align*}
+    NET \after s &= (FETCH'_{13} \ic
+                    (\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+                     \chan{fetch}\wr 10 \ra NET_{9})) \after s \\
+                 &= (FETCH'_{13} \ic
+                     (\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+                      \chan{fetch}\wr 10 \ra NET_{9})) \after
+                      \ab{\chan{fetch}.10, \chan{fetch}.12, \chan{fetch}.11} \\
+                 &= ((FETCH'_{13} \ic
+                     (\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+                     \chan{fetch}\wr 10 \ra NET_{9})) \after
+                     \ab{\chan{fetch}.10} ) \after
+                     \ab{\chan{fetch}.12, \chan{fetch}.11} & [1.8.3,~L2]
+\end{align*}
+We now use law $[3.2.3,~L2]$ where we first specify the traces of the sets $P$
+and $Q$ in the internal choice:
+\begin{align*}
+  traces(P) &= traces(FETCH'_{13}) \\
+            &= \sN{\ab{ }} \cup
+                \sN{\ab{\chan{fetch}.13} \cat t \ch t \in traces(FETCH'_{12})}
+                & [1.8.1,~L2] \\
+  traces(Q) &= traces(\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+                                    \chan{fetch}\wr 10 \ra NET_{9}) \\
+            &= \sN{t \ch t = \ab{ } \lor
+            (t_0 = \chan{fetch}\wr 13 \land t' \in traces(FETCH'_{12})) \lor
+            (t_0 = \chan{fetch}\wr 10 \land t' \in traces(NET_9))
+            } & [1.8.1,~L3] \\
+            &= \sN{\ab{ }} \cup
+                    \sN{\ab{\chan{fetch}.13} \cat t \ch t \in traces(FETCH'_{12})}
+                    \cup
+                    \sN{\ab{\chan{fetch}.10} \cat t \ch t \in traces(NET_9)}
+\end{align*}
+Since $\ab{\chan{fetch}.10} \in (traces(Q) - traces(P))$ we conclude:
+\begin{align*}
+    NET \after s &= ((\chan{fetch}\wr 13 \ra FETCH'_{12} \ch
+    \chan{fetch}\wr 10 \ra NET_{9}) \after \ab{\chan{fetch}.10} ) \after
+    \ab{\chan{fetch}.12, \chan{fetch}.11} & [3.2.3,~L2] \\
+                 &= NET_9 \after \ab{\chan{fetch}.12,\chan{fetch}.11} &
+                 [1.8.3,~L3A] \\
+                 &= (FETCH'_{12} \ic
+                    (\chan{fetch}\wr 12 \ra FETCH'_{11} \ch
+                     \chan{fetch}\wr 9 \ra NET_{8})) \after
+                     \ab{\chan{fetch}.12,\chan{fetch}.11} \\
+                 &= ((FETCH'_{12} \ic
+                    (\chan{fetch}\wr 12 \ra FETCH'_{11} \ch
+                    \chan{fetch}\wr 9 \ra NET_{8})) \after \ab{\chan{fetch}.12})
+                    \after \ab{\chan{fetch}.11} & [1.8.3,~L2]
+\end{align*}
+Again we compute the traces of the sets $P$ and $Q$ for law $[3.2.3,~L2]$:
+\begin{align*}
+    traces(P) &= traces(FETCH'_{12}) \\
+              &= \sN{\ab{ }} \cup
+              \sN{\ab{\chan{fetch}.12} \cat t \ch t \in traces(FETCH'_{11}} &
+              [1.8.1,~L2] \\
+    traces(Q) &= traces(\chan{fetch}\wr 12 \ra FETCH'_{11} \ch
+                        \chan{fetch}\wr 9  \ra NET_{8}) \\
+              &= \sN{\ab{ }} \cup
+              \sN{\ab{\chan{fetch}.12 \cat t \ch t \in traces(FETCH'_{11})}}
+              \cup
+              \sN{\ab{\chan{fetch}.9 \cat t \ch t \in traces(NAT_{8})}}
+\end{align*}
+This time we see that $\chan{fetch}.12 \in (traces(P) \cap traces(Q))$ and hence
+by $[3.2.3,~L2]$ we get:
+\begin{align*}
+    NET \after s &= ((FETCH'_{12} \after \ab{\chan{fetch}.12}) \ic
+                    ((\chan{fetch}\wr 12 \ra FETCH'_{11} \ch
+                    \chan{fetch}\wr 9 \ra NET_{8}) \after \ab{\chan{fetch}.12})) \after
+                    \ab{\chan{fetch}.11}
+\end{align*}
+\begin{align*}
+    NET \after s &= (FETCH'_{11}\ic
+                     FETCH'_{11}) \after
+                    \ab{\chan{fetch}.11} & 2 \times [1.8.3,~L3A] \\
+                 &= FETCH'_{11} \after \ab{\chan{fetch}.11} & [3.2.1,~L1] \\
+                 &= FETCH'_{10} & [1.8.3,~L3A] \\
+\end{align*}
+
 
 \section{Refusals of $NET$ and $NET \after s$}
 
 \subsection{Refusals of $NET$}
+Remember the definition of $NET_x$ and $NET$:
+\begin{align*}
+    NET_x &= FETCH'_{x+3} \ic
+             \underbrace{(\chan{fetch} \wr (x+3) \ra FETCH'_{x+2} \ch
+             \chan{fetch} \wr x \ra NET_{x-1})}_{NET'_x} \\
+    NET &= NET_{10} = FETCH'_{13} \ic NET'_{10}
+\end{align*}
+And need to show that:
+\begin{align*}
+    \sN{\chan{fetch}.10, \chan{fetch}.42} \in \refusals{NET} \\
+    \sN{\chan{fetch}.13} \not \in \refusals{NET}
+\end{align*}
+
+We compute the refusals of $NET$:
+\begin{align*}
+    \refusals{NET} &=
+    \refusals{FETCH'_{13}} \cup \refusals{NET'_{10}} & [3.4.1,~L4] \\
+    \refusals{FETCH'_{13}} &=
+    \refusals{ X \ch X \subseteq (\alpha(FETCH'_{12}) - \sN{\chan{fetch}\wr 13}) }
+        & [3.4.1,~L2] \\
+    B &= \sN{\chan{fetch}\wr 13,\chan{fetch}\wr 10} & [3.4.1,~L3] \\
+    \refusals{NET_{10}} &= \sN{ X \ch X \subseteq (\alpha(NET_{10}) - 
+            \sN{\chan{fetch}\wr 13,\chan{fetch}\wr 10})}
+\end{align*}
+Looking at these urefusals we can quickly conclude that $\sN{\chan{fetch}.10,
+\chan{fetch}.42} \in \refusals{NET}$ since the only 1-length-elements subtracted from
+$\sN{\abs{\chan{fetch}}}$ are $\chan{fetch}\wr 13$ and $\chan{fetch}\wr 10$.
+This is likewise the argument for concluding that $\sN{\chan{fetch}.13} \not \in
+traces(NET)$.
 
 \subsection{Refusals of $NET \after s$}
+Remember the definition of $NET \after s$:
+\begin{align*}
+    NET \after s &= FETCH'_{10}
+\end{align*}
+And need to show that:
+\begin{align*}
+    \sN{\chan{fetch}.13, \chan{fetch}.42} \in \refusals{NET \after s} \\
+    \sN{\chan{fetch}.10} \not \in \refusals{NET \after s}
+\end{align*}
 
+We compute the 1-size-elements of the refusals:
+\begin{align*}
+    \refusals{NET \after s} &= \refusals{\chan{fetch}\wr 10 \ra FETCH'_9} \\
+    &= \sN{ X \ch X \subseteq (\alpha(FETCH'_9) - \sN{\chan{fetch}\wr 10}}
+        & [3.4.1,~L2]
+\end{align*}
+Again we use the same argument as in the exercise above. The only 1-size-element
+from the set $\sN{\abs{\chan{fetch}}}$ subtracted from the refusal set is
+$\chan{fetch}\wr 10$ and hence $\sN{\chan{fetch}.13,\chan{fetch}.42} \in
+traces(NET \after s)$ and $\sN{\chan{fetch}.10} \not \in traces(NET \after s)$.
 \end{document}
-
