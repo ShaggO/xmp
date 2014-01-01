@@ -1,0 +1,62 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{minted}
+\usepackage{amsmath,amssymb,amsfonts}
+
+\title{Extreme Multiprogramming\\Assignment 2 - programming}
+\author{Malte Stær Nissen}
+
+\begin{document}
+\date{\today}
+
+\maketitle
+\section{Considerations on concurrency in the game}
+The system is set up to let the room processes perform all data-handling.
+Each client has a corresponding user object with a reading end of a channel
+for reading user commands and a writing end for another channel returning
+data/control to the client once the room has processed the given command.
+Furthermore each client has a notification channel and a corresponding
+notification reader process which receives notifications of other clients
+entering and leaving the room which the client is currently in. The
+notification retrieval is performed in an asynchronous process to avoid
+deadlocks when notifying people in other rooms.
+
+Each room has an ``input'' channel (reading end), which all the adjacent
+rooms can write to in order to transfer a client into the room. The actual
+transfer is performed in an asynchronous process in order to avoid deadlocks
+it two rooms start transferring players to one another at the same time. A
+transfer is performed by first removing the player ``object'' from the room
+it resides and then write it to the input channel of the new room followed by
+notifications to all players in question and a final return signal (True) to
+the client return channel.
+
+\section{Shutdown of the system}
+Since each room has a list of clients and client notification processes as
+well as channels to the adjacent rooms, a shutdown is a simple poison of all
+writing endpoints the room receiving an exit command. This will eventually
+force all rooms to poison all their clients and thus shutting down the entire
+network.
+
+\section{Graphical CSP-network design}
+
+\clearpage
+\appendix
+
+\section{room.py}
+\inputminted[linenos,fontsize=\scriptsize]{python}{src/room.py}
+
+\section{agent.py}
+\inputminted[linenos,fontsize=\scriptsize]{python}{src/agent.py}
+
+\section{player.py}
+\inputminted[linenos,fontsize=\scriptsize]{python}{src/player.py}
+
+\section{game.py}
+\inputminted[linenos,fontsize=\scriptsize]{python}{src/game.py}
+
+\end{document}
+
