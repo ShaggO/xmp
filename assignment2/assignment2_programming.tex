@@ -1,11 +1,17 @@
 \documentclass[11pt,a4paper]{article}
 
+\usepackage[
+    top= 1in,
+    right=0.5in,
+    bottom=1in,
+    left=0.5in]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{minted}
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
 
 \title{Extreme Multiprogramming\\Assignment 2 - programming}
 \author{Malte Stær Nissen}
@@ -14,6 +20,18 @@
 \date{\today}
 
 \maketitle
+\section{Graphical CSP-network design}
+Figure \ref{fig:model} shows a CSP network graph of the MUD game implemented in
+this assignment. When the graph says $\text{player}[x]$ it refers to a
+specific player $x$ and the information/channels associated with this player in
+the specific room. The game can be run by executing the file \texttt{game.py}
+with python 2.7.4 and PyCSP installed.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{network.pdf}
+    \caption{MUD CSP network graph/model}
+    \label{fig:model}
+\end{figure}
 \section{Considerations on concurrency in the game}
 The system is set up to let the room processes perform all data-handling.
 Each client has a corresponding user object with a reading end of a channel
@@ -27,21 +45,25 @@ deadlocks when notifying people in other rooms.
 
 Each room has an ``input'' channel (reading end), which all the adjacent
 rooms can write to in order to transfer a client into the room. The actual
-transfer is performed in an asynchronous process in order to avoid deadlocks
-it two rooms start transferring players to one another at the same time. A
-transfer is performed by first removing the player ``object'' from the room
-it resides and then write it to the input channel of the new room followed by
-notifications to all players in question and a final return signal (True) to
-the client return channel.
+transfer (sender end) is performed in an asynchronous process in order to
+avoid deadlocks if two rooms try to transfer players to one another at the
+same time. A transfer is performed by first removing the player ``object''
+from the room it resides and then write it to the input channel of the new
+room followed by notifications to all players in question and a final return
+signal (True) to the client return channel.
+
+The clients are purposely set to sleep for 3 seconds in between walking commands
+in order to avoid cluttering std.out with notifications. This can be removed in
+\texttt{agent.py}.
 
 \section{Shutdown of the system}
 Since each room has a list of clients and client notification processes as
 well as channels to the adjacent rooms, a shutdown is a simple poison of all
-writing endpoints the room receiving an exit command. This will eventually
+channels the room is associated with. This will eventually
 force all rooms to poison all their clients and thus shutting down the entire
-network.
+network as long as all rooms were (in)directly connected at startup (which they
+are in my initialization).
 
-\section{Graphical CSP-network design}
 
 \clearpage
 \appendix
