@@ -5,7 +5,8 @@ from pycsp.greenlets import *
 ##### Initialize player
 pChans = Channel() * 12
 pObjects = []
-# Initialize player objects for the world
+# Initialize player objects to be used internally in the rooms/the world
+# 1 client and 3 automatic agents
 pObjects.append({
     'name':  'Malte',
     'cin':   pChans[0].reader(),
@@ -34,7 +35,7 @@ pObjects.append({
     'cnote': pChans[11].writer(),
     'items': []})
 
-# Initialize player processes
+# Initialize client/player processes
 pAgents = []
 pAgents.append(player.player(-pChans[0], +pChans[1], +pChans[2]))
 pAgents.append(agent.agent(-pChans[3], +pChans[4], +pChans[5], 'Agent #0'))
@@ -50,6 +51,7 @@ rChans = Channel() * 4
 #  3  2
 
 # Room 0
+# Add all player objects
 rooms = []
 rooms.append(room.room(
     'Room #0',
@@ -103,12 +105,11 @@ rooms.append(room.room(
     ))
 
 
-# Run the world
-
-
+# Run the world in parallel
 Parallel(
     rooms,
     pAgents
 )
 
+# Mandatory shutdown of PyCSP
 shutdown()
