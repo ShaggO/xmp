@@ -1,0 +1,46 @@
+channel coin, sprite, pepsi, think    -- really events
+
+aVM = {coin, pepsi, sprite}  -- just for reference
+VM = coin -> (pepsi -> VM [] coin -> sprite -> VM)
+
+aRICH = {coin, think}
+RICH = coin -> think -> RICH
+
+aTHIRSTY = {sprite, pepsi}
+THIRSTY1 = sprite -> THIRSTY1
+THIRSTY2 = pepsi -> THIRSTY2
+
+aALL = {coin, think, sprite, pepsi}
+
+Sa = VM [| {coin} |] RICH
+
+Sb = Sa [| aTHIRSTY |] THIRSTY1
+
+Sc = RICH [| {} |] THIRSTY1
+
+Sd = VM [| {coin, sprite, pepsi} |] Sc
+
+Se = Sa [| aTHIRSTY |] THIRSTY2
+
+fSc = Sc [[ sprite <- pepsi, pepsi <- sprite ]]
+
+Sf = VM [| {coin, sprite, pepsi} |] fSc
+
+-- checking trace-equivalence suffices for deterministic processes
+assert Sb [T= Sd
+assert Sd [T= Sb
+
+assert Se [T= Sf
+assert Sf [T= Se
+
+assert Sd [T= Se   -- should fail
+
+assert Sa :[deadlock free]
+assert Sb :[deadlock free]
+assert Sc :[deadlock free]
+assert Sd :[deadlock free]
+assert Se :[deadlock free]  -- should fail
+assert Sf :[deadlock free]  -- should fail
+
+assert Sd :[deterministic]
+assert Se :[deterministic]

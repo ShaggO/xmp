@@ -1,0 +1,23 @@
+channel coin, sprite, pepsi
+
+SVM = coin -> (sprite -> SVM |~| pepsi -> STOP)
+
+I1 = coin -> sprite -> I1
+I2 = coin -> pepsi -> STOP
+I3 = coin -> (sprite -> I3 [] pepsi -> STOP)
+
+I4 = coin -> I4
+I5 = coin -> sprite -> pepsi -> STOP
+I6 = coin -> pepsi -> I6
+
+assert SVM :[deterministic]  -- should fail
+
+-- should succeed
+assert SVM [T= I1
+assert SVM [T= I2
+assert SVM [T= I3
+
+-- should fail
+assert SVM [T= I4
+assert SVM [T= I5
+assert SVM [T= I6

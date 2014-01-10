@@ -1,0 +1,24 @@
+channel coin, sprite, pepsi
+
+SVMI = coin -> (sprite -> SVMI |~| pepsi -> STOP)
+SVME = coin -> (sprite -> SVME [] pepsi -> STOP)
+
+I1 = coin -> sprite -> I1
+I2 = coin -> (sprite -> I2 |~| pepsi -> STOP)
+I3 = coin -> (sprite -> I2 [] pepsi -> STOP)
+
+-- TRACE refinement
+-- should succeed 
+assert SVMI [T= I1
+assert SVME [T= I1
+
+-- FAILURE refinement
+-- should succeed
+assert SVMI [F= I1
+assert SVMI [F= I2
+assert SVMI [F= I3
+
+-- should fail
+assert SVME [F= I1
+assert SVME [F= I2
+
